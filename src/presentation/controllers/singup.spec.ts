@@ -1,19 +1,32 @@
-import { SingUpController } from './singup'
 import { InvalidParamError, MissingParamError, ServerError } from '../errors'
 import { EmailValidator } from '../protocols'
+import { SingUpController } from './singup'
 
 interface SutTypes {
   sut: SingUpController
   emailValidatorStub: EmailValidator
 }
 
-const makeSut = (): SutTypes => {
+const makeEmailValidatorStubError = (): EmailValidator => {
+  class EmailValidatorStub implements EmailValidator {
+    isValid(email: string): boolean {
+      throw new Error()
+    }
+  }
+  return new EmailValidatorStub()
+}
+
+const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid(email: string): boolean {
       return true
     }
   }
-  const emailValidatorStub = new EmailValidatorStub()
+  return new EmailValidatorStub()
+}
+
+const makeSut = (): SutTypes => {
+  const emailValidatorStub = makeEmailValidatorStub()
   const sut = new SingUpController(emailValidatorStub)
   return {
     sut,
@@ -141,12 +154,7 @@ describe('SignUp Controller', () => {
   })
 
   test('Deve retornar erro 500 caso ocorra algum problema no Email Validator ', () => {
-    class EmailValidatorStub implements EmailValidator {
-      isValid(email: string): boolean {
-        throw new Error()
-      }
-    }
-    const emailValidatorStub = new EmailValidatorStub()
+    const emailValidatorStub = makeEmailValidatorStubError()
     const sut = new SingUpController(emailValidatorStub)
     const httpRequest = {
       body: {
