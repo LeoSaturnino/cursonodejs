@@ -1,4 +1,4 @@
-import { ServerError } from './../errors/server-error'
+import { serverError } from './../helpers/http-helper'
 import { EmailValidator } from './../protocols/email-validator'
 import { HttpResponse, HttpRequest } from '../protocols/http'
 import { MissingParamError } from '../errors/missing-param-error'
@@ -29,10 +29,7 @@ export class SingUpController implements Controller {
         body: {}
       }
     } catch (error) {
-      return {
-        statusCode: 500,
-        body: new ServerError()
-      }
+      return serverError()
     }
   }
 }
