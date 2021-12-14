@@ -1,3 +1,4 @@
+import { ServerError } from './../errors/server-error'
 import { SingUpController } from './singup'
 import { MissingParamError } from '../errors/missing-param-error'
 import { InvalidParamError } from '../errors/invalid-param-error'
@@ -142,8 +143,13 @@ describe('SignUp Controller', () => {
   })
 
   test('Deve retornar erro 500 caso ocorra algum problema no Email Validator ', () => {
-    const { sut, emailValidatorStub } = makeSut()
-    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
+    class EmailValidatorStub implements EmailValidator {
+      isValid(email: string): boolean {
+        throw new Error()
+      }
+    }
+    const emailValidatorStub = new EmailValidatorStub()
+    const sut = new SingUpController(emailValidatorStub)
     const httpRequest = {
       body: {
         name: 'qualquer_nome',
@@ -155,7 +161,7 @@ describe('SignUp Controller', () => {
 
     const httpResponse = sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new InvalidParamError('email'))
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
