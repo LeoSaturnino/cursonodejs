@@ -23,8 +23,8 @@ const makeAddAccountStub = (): AddAccount => {
     add(account: AddAccountModel): AccountModel {
       const fakeAccount = {
         id: 'valid_id',
-        name: 'qualquer_name',
-        email: 'qualquer_email@email.com',
+        name: 'valid_nome',
+        email: 'valid_email@email.com',
         password: 'valid_password'
       }
       return fakeAccount
@@ -49,14 +49,20 @@ describe('SignUp Controller', () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
-        name: 'qualquer_nome',
-        email: 'qualquer_email@email.com',
-        password: 'qualquer_password',
-        passwordConfirmation: 'qualquer_password'
+        name: 'valid_nome',
+        email: 'valid_email@email.com',
+        password: 'valid_password',
+        passwordConfirmation: 'valid_password'
       }
     }
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      id: 'valid_id',
+      name: 'valid_nome',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    })
   })
 
   test('Deve retornar erro 400 caso não seja informado o nome ', () => {
