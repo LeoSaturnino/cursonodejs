@@ -197,4 +197,22 @@ describe('SignUp Controller', () => {
       password: 'qualquer_password'
     })
   })
+
+  test('Deve retornar erro 500 caso ocorra algum problema no Add Account ', () => {
+    const { sut, addAccountStub } = makeSut()
+    jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        name: 'qualquer_nome',
+        email: 'qualquer_email@email.com',
+        password: 'qualquer_password',
+        passwordConfirmation: 'qualquer_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
 })
